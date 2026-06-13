@@ -172,6 +172,19 @@ def test_config_omits_tushare_from_default_priority_without_token(monkeypatch):
     ]
 
 
+def test_config_defaults_candidate_context_providers_include_quote(monkeypatch):
+    monkeypatch.delenv("LLM_CANDIDATE_CONTEXT_PROVIDERS", raising=False)
+
+    config = Config.from_env()
+
+    assert config.llm_candidate_context_providers == [
+        "news",
+        "fund_flow",
+        "announcement",
+        "quote",
+    ]
+
+
 def test_config_respects_explicit_snapshot_priority_with_tushare_token(monkeypatch):
     monkeypatch.setenv("TUSHARE_TOKEN", "token")
     monkeypatch.setenv("SNAPSHOT_SOURCE_PRIORITY", "efinance,em_datacenter")

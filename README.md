@@ -236,6 +236,7 @@ Source support matrix:
 |---|---|---|
 | Daily K-line enrichment | `tushare` when token exists, then `tencent`, `akshare`, `baostock` | OHLCV, qfq where supported, technical factors |
 | Full-market snapshot | `sina`, then `efinance`, `akshare_em`, `em_datacenter`; `tushare` first when token exists | price, change, amount, market cap, PE/PB, turnover |
+| Candidate context | `news`, `fund_flow`, `announcement`, `quote` | news, announcements, fund flow, Tencent quote valuation/turnover |
 | Last-good fallback | daily history cache and snapshot cache | marked with stale/fallback attrs when live sources fail |
 
 If a source is unavailable or lacks fields required by a strategy, AlphaSift skips it and tries the next source. Eastmoney-only HTTP fallbacks use a shared throttled session to reduce connection churn and bursty access. If all live sources fail, the last-good snapshot fallback is explicitly marked as stale/fallback data; `SNAPSHOT_FALLBACK_MAX_AGE_HOURS` can reject overly old fallback cache to avoid repeating stale selections.

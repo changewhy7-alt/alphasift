@@ -159,7 +159,7 @@ class Config:
     llm_context: str = ""
     llm_candidate_context_enabled: bool = False
     llm_candidate_context_max_candidates: int = 8
-    llm_candidate_context_providers: list[str] = field(default_factory=lambda: ["news", "fund_flow", "announcement"])
+    llm_candidate_context_providers: list[str] = field(default_factory=lambda: ["news", "fund_flow", "announcement", "quote"])
     llm_candidate_context_news_limit: int = 3
     llm_candidate_context_announcement_limit: int = 3
     llm_candidate_context_cache_enabled: bool = True
@@ -285,7 +285,7 @@ class Config:
             ),
             llm_candidate_context_providers=_parse_csv_env(
                 "LLM_CANDIDATE_CONTEXT_PROVIDERS",
-                ["news", "fund_flow", "announcement"],
+                ["news", "fund_flow", "announcement", "quote"],
             ),
             llm_candidate_context_news_limit=max(1, int(os.getenv("LLM_CANDIDATE_CONTEXT_NEWS_LIMIT", "3"))),
             llm_candidate_context_announcement_limit=max(

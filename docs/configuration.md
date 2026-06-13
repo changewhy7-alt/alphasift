@@ -52,7 +52,7 @@ TUSHARE_TOKEN=...
 | `LLM_CONTEXT_MAX_CHARS` | 否 | 拼接后传给 LLM 的上下文最大长度 | `4000` |
 | `LLM_CANDIDATE_CONTEXT_ENABLED` | 否 | 是否默认对 LLM Top K 候选抓取新闻、公告、资金流线索 | `false` |
 | `LLM_CANDIDATE_CONTEXT_MAX_CANDIDATES` | 否 | 候选级上下文最多抓取前 N 只 | `8` |
-| `LLM_CANDIDATE_CONTEXT_PROVIDERS` | 否 | 候选级抓取来源，逗号分隔：`news,fund_flow,announcement` | `news,fund_flow,announcement` |
+| `LLM_CANDIDATE_CONTEXT_PROVIDERS` | 否 | 候选级抓取来源，逗号分隔：`news,fund_flow,announcement,quote` | `news,fund_flow,announcement,quote` |
 | `LLM_CANDIDATE_CONTEXT_CACHE_ENABLED` | 否 | 是否缓存候选级抓取上下文 | `true` |
 | `LLM_CANDIDATE_CONTEXT_CACHE_TTL_HOURS` | 否 | 候选上下文缓存有效小时数 | `24` |
 | `INDUSTRY_MAP_FILES` | 否 | 本地 code->industry/concepts/board_heat 映射 CSV/JSON/JSONL，逗号分隔 | - |
@@ -150,6 +150,7 @@ tushare -> sina -> efinance -> akshare_em -> em_datacenter
 |------|----------|----------|
 | 日 K 增强 | 有 token: `tushare,tencent,akshare,baostock`；无 token: `tencent,akshare,baostock` | OHLCV、前复权、技术指标 |
 | 全市场快照 | 有 token: `tushare,sina,efinance,akshare_em,em_datacenter`；无 token: `sina,efinance,akshare_em,em_datacenter` | 价格、涨跌幅、成交额、市值、PE/PB、换手率 |
+| 候选级上下文 | `news,fund_flow,announcement,quote` | 新闻、资金流、公告、腾讯行情估值/换手率 |
 | 失败降级 | source health 熔断 + daily history cache + snapshot last-good cache | stale/fallback/source_errors 元数据 |
 
 ## L3 后置分析器
