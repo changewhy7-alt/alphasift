@@ -11,16 +11,6 @@ AlphaSift is an agent-friendly stock discovery and ranking engine. It scans a br
 - Outputs depend on third-party market data, optional LLM providers, local configuration, and strategy parameters. They can be delayed, incomplete, wrong, or unsuitable for real trading.
 - Users are responsible for independent research, compliance checks, transaction costs, liquidity risks, announcement timing, and all resulting decisions.
 
-## Screenshots
-
-### Quickstart: no API key demo
-
-<img src="docs/screenshots/quickstart.svg" alt="AlphaSift quickstart terminal screenshot" width="900">
-
-### Hotspot contract: cache fallback and detail quality metadata
-
-<img src="docs/screenshots/hotspot-detail.svg" alt="AlphaSift hotspot detail terminal screenshot" width="900">
-
 ## What AlphaSift does
 
 - **L1 deterministic screening**: hard filters and factor scoring over the full market snapshot.
@@ -76,6 +66,10 @@ alphasift screen dual_low --no-post-analysis
 # Audit project and strategy configuration
 alphasift audit
 ```
+
+Example quickstart output:
+
+<img src="docs/screenshots/quickstart.svg" alt="AlphaSift quickstart terminal output" width="900">
 
 ## Hotspot workflow
 
@@ -268,6 +262,12 @@ alphasift/
 - Tushare fallback depends on the user's own token, point balance, and permissions.
 - T+N evaluation compares saved run prices with later snapshots; it is not a rigorous event-study backtest and does not model dividends, suspensions, slippage, or rebalancing constraints.
 - The repository keeps both `strategies/` and `alphasift/strategies/` mirrors for development and packaged usage; built-in strategy files should stay in sync.
+
+## Verification
+
+The current documentation update was validated against the real test suite output below:
+
+<img src="docs/screenshots/test-run.svg" alt="AlphaSift real pytest run output" width="900">
 
 ## Documentation
 
