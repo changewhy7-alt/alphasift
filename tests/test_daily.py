@@ -174,6 +174,17 @@ def test_daily_source_health_reorders_auto_sources(monkeypatch):
     assert notes == ["daily source order adjusted by health: sina,akshare,tencent"]
 
 
+def test_daily_source_health_does_not_promote_later_success_above_neutral_source(monkeypatch):
+    _SOURCE_HEALTH.clear()
+    monkeypatch.setattr("alphasift.daily.time.monotonic", lambda: 100.0)
+    _record_source_success("sina", rows=60)
+
+    ranked, notes = _rank_daily_sources_by_health(("tushare", "tencent", "sina"))
+
+    assert ranked == ("tushare", "tencent", "sina")
+    assert notes == []
+
+
 def test_fetch_daily_history_uses_cache_until_ttl(tmp_path, monkeypatch):
     calls = {"count": 0}
 

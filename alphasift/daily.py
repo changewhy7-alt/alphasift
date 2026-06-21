@@ -278,14 +278,12 @@ def _rank_daily_sources_by_health(sources: tuple[str, ...]) -> tuple[tuple[str, 
         health = {source: dict(_SOURCE_HEALTH.get(source, {})) for source in sources}
     default_rank = {source: idx for idx, source in enumerate(sources)}
 
-    def rank_key(source: str) -> tuple[int, float, float, int]:
+    def rank_key(source: str) -> tuple[int, float, int]:
         state = health.get(source, {})
         disabled_until = float(state.get("disabled_until", 0.0))
         disabled = disabled_until > now
         failures = float(state.get("failures", 0.0))
-        successes = float(state.get("successes", 0.0))
-        avg_rows = float(state.get("avg_rows", 0.0))
-        return (1 if disabled else 0, failures, -successes - (avg_rows / 10000.0), default_rank[source])
+        return (1 if disabled else 0, failures, default_rank[source])
 
     ranked = tuple(sorted(sources, key=rank_key))
     if ranked == sources:
