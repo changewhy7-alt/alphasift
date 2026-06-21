@@ -138,6 +138,9 @@ def test_fetch_daily_history_uses_cache_until_ttl(tmp_path, monkeypatch):
 
     assert calls["count"] == 1
     assert list(first["收盘"]) == list(second["收盘"])
+    assert first.attrs["daily_source"] == "akshare"
+    assert second.attrs["daily_source"] == "akshare"
+    assert second.attrs["daily_requested_source"] == "akshare"
     assert len(list((tmp_path / "daily_history").glob("*.json"))) == 1
 
 
@@ -376,6 +379,8 @@ def test_fetch_daily_history_supports_tencent_direct_http(monkeypatch):
     assert list(result["date"]) == ["2026-04-28", "2026-04-29"]
     assert result["close"].iloc[-1] == 10.5
     assert pd.isna(result["amount"].iloc[-1])
+    assert result.attrs["daily_source"] == "tencent"
+    assert result.attrs["daily_requested_source"] == "tencent"
 
 
 def test_fetch_daily_history_auto_uses_tencent_before_wrapper_sources(monkeypatch):
@@ -488,6 +493,9 @@ def test_fetch_daily_history_auto_falls_back_from_tencent_to_sina(monkeypatch):
     assert "fqkline" in calls[0][0]
     assert "CN_MarketDataService.getKLineData" in calls[1][0]
     assert result["close"].iloc[-1] == 10.5
+    assert result.attrs["daily_source"] == "sina"
+    assert result.attrs["daily_requested_source"] == "auto"
+    assert result.attrs["source_errors"][0].startswith("tencent after 1 attempts")
 
 
 def test_enrich_daily_features_keeps_successful_rows_when_one_fetch_fails(monkeypatch):
@@ -499,10 +507,12 @@ def test_enrich_daily_features_keeps_successful_rows_when_one_fetch_fails(monkey
     def fake_fetch_daily_history(code, **kwargs):
         if code == "600000":
             raise ConnectionError("remote disconnected")
-        return pd.DataFrame({
+        hist = pd.DataFrame({
             "日期": pd.date_range("2026-01-01", periods=80).astype(str),
             "收盘": [10 + i * 0.1 for i in range(80)],
         })
+        hist.attrs["daily_source"] = "akshare"
+        return hist
 
     monkeypatch.setattr("alphasift.daily.fetch_daily_history", fake_fetch_daily_history)
 
@@ -512,6 +522,7 @@ def test_enrich_daily_features_keeps_successful_rows_when_one_fetch_fails(monkey
     assert len(result.attrs["daily_errors"]) == 1
     assert "600000" in result.attrs["daily_errors"][0]
     assert result.loc[0, "daily_data_points"] == 80
+    assert result.loc[0, "daily_source"] == "akshare"
     assert pd.isna(result.loc[1, "daily_data_points"])
 
 

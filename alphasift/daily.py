@@ -36,6 +36,7 @@ _DAILY_FEATURE_DEFAULTS = {
     "consolidation_days_20d": pd.NA,
     "volatility_20d_pct": pd.NA,
     "max_drawdown_20d_pct": pd.NA,
+    "daily_source": "",
 }
 _DAILY_ENRICH_MAX_WORKERS = 1
 _DAILY_HISTORY_CACHE_VERSION = 1
@@ -91,7 +92,9 @@ def enrich_daily_features(
                 cache_dir=cache_dir,
                 cache_ttl_seconds=cache_ttl_seconds,
             )
-            return idx, compute_daily_features(hist), None
+            features = compute_daily_features(hist)
+            features["daily_source"] = str(hist.attrs.get("daily_source", ""))
+            return idx, features, None
         except Exception as exc:
             return idx, dict(_DAILY_FEATURE_DEFAULTS), f"{code}: {exc}"
 
@@ -198,6 +201,9 @@ def fetch_daily_history(
                         normalized_code,
                         lookback_days=normalized_lookback_days,
                     )
+                result.attrs["daily_source"] = current
+                result.attrs["daily_requested_source"] = src
+                result.attrs["source_errors"] = list(errors)
                 if cache_path is not None:
                     _write_daily_history_cache(
                         cache_path,
@@ -325,6 +331,11 @@ def _read_daily_history_cache(
         if not isinstance(columns, list) or not isinstance(data, list):
             return None
         df = pd.DataFrame(data, columns=columns)
+        metadata = payload.get("metadata")
+        if isinstance(metadata, dict):
+            for key in ("daily_source", "daily_requested_source", "source_errors"):
+                if key in metadata:
+                    df.attrs[key] = metadata[key]
         if is_stale:
             df.attrs["daily_stale"] = True
         return df
@@ -348,6 +359,11 @@ def _write_daily_history_cache(
                 "code": code,
                 "source": source,
                 "lookback_days": int(lookback_days),
+            },
+            "metadata": {
+                "daily_source": df.attrs.get("daily_source", source),
+                "daily_requested_source": df.attrs.get("daily_requested_source", source),
+                "source_errors": list(df.attrs.get("source_errors", [])),
             },
             "created_at": datetime.now().isoformat(),
             "frame": json.loads(df.to_json(orient="split", date_format="iso", force_ascii=False)),
